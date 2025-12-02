@@ -2,7 +2,7 @@
 ### A Protocol for Non-Transferable Digital Asset and Identity Binding.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)  
-![Status](https://img.shields.io/badge/status-Demo_Pending_Deployment-important.svg)
+![Status](https://img.shields.io/badge/status-Deployed-green.svg)
 
 A blockchain-based platform for issuing and verifying academic and professional credentials as **non-transferable NFTs (Soulbound Tokens)**. This system addresses the inefficiencies, fraud risks, and lack of ownership in traditional credential verification by creating a single, immutable source of truth that is globally accessible and mathematically secure.
 
@@ -10,10 +10,7 @@ A blockchain-based platform for issuing and verifying academic and professional 
 
 ## Live Demo & Documentation
 
-> **Note:** The demo functionality will be available once the hosted UI is deployed.
-> You can still explore the complete flow by running the project locally.
-
-- **Live Application:** *TBD*
+- **Live Application:** [Launch dApp](https://sbt-verifiable-credentials.vercel.app/)
 - **Full Technical Documentation:** *[documentation file](./documentation/Documentation.pdf)*
 
 ---
@@ -148,5 +145,6 @@ To interact with the smart contracts on the Sepolia testnet, you will need Sepol
 |-------------------|-----------------------------------------------|---------------|
 |**CertificateNft** |	`0xc009f31C9f68c4d141091350D3aDDb77AB40d4F3`	| [Sepolia Etherscan Link](https://sepolia.etherscan.io/address/0xc009f31c9f68c4d141091350d3addb77ab40d4f3) |
 |**DemoRoleFaucet**	| `0x5fA4f02152d33ab9FE683574525b89D024Ae9c1f`	| [Sepolia Etherscan Link](https://sepolia.etherscan.io/address/0x5fA4f02152d33ab9FE683574525b89D024Ae9c1f) |
+
 
 
