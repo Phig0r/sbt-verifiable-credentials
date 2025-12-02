@@ -5,11 +5,11 @@
  * component props, and general application state.
 */
 
-import type { CertificateNft, DemoRoleFaucet } from "../../../smart-contarcts/typechain-types";
+import type { CertificateNft, DemoRoleFaucet } from "../../../smart-contracts/typechain-types";
 import type {ethers, BigNumberish } from "ethers";
 
 // --- Web3 & Smart Contract Types ---
-export type{CertificateNft, DemoRoleFaucet}
+export type {CertificateNft, DemoRoleFaucet}
 
 export type StatusString = 'Active' | 'Suspended' | 'Deactivated' | undefined;
 export type Roles = 'admin' | 'issuer' | 'recipient' |undefined;

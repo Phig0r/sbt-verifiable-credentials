@@ -48,6 +48,7 @@ contract CertificateNft is ERC721, AccessControl {
       _setRoleAdmin(ISSUER_ROLE, ADMIN_ROLE);
    }
 
+
    /**
     * @dev See {IERC165-supportsInterface}.
     */
