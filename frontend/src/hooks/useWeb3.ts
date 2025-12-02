@@ -3,6 +3,7 @@
  * @description A centralized collection of custom React hooks for interacting with the
  * CertifyChain smart contracts. This file encapsulates all the core Web3 logic,
  * including wallet connection, contract instance creation, and data fetching.
+ * Includes automatic network switching to Sepolia testnet when connecting wallets to ensure compatibility.
  */
 
 "use client";
@@ -18,6 +19,21 @@ import {demoFaucetContractAbi} from "../utils/abi/DemoRoleFacuetABI.json";
 import { wait } from "../utils/constants";
 import type { CertificateNft, DemoRoleFaucet ,CertificateData, ToastState, ToastType, Roles } from "../types/types";
 
+const SEPOLIA_CHAIN_ID = BigInt(11155111);
+const SEPOLIA_NETWORK = {
+  chainId: '0xaa36a7',
+  chainName: 'Sepolia',
+  nativeCurrency: {
+    name: 'ETH',
+    symbol: 'ETH',
+    decimals: 18,
+  },
+  rpcUrls: [
+    import.meta.env.VITE_ALCHEMY_SEPOLIA_URL || 'https://rpc.sepolia.org'
+  ],
+  blockExplorerUrls: ['https://sepolia.etherscan.io'],
+};
+
 // --- CONTRACT HOOK ---
 
 export function useContract(signer: Signer | null) {
@@ -26,18 +42,18 @@ export function useContract(signer: Signer | null) {
       provider = new ethers.BrowserProvider((window as any).ethereum);
    }
 
-    const contract = useMemo(() => {
-      const contractRunner = signer ?? provider;
-        if (!contractRunner) {
-            return null;
-        }
-        return new ethers.Contract(
-            CERTIFY_CHAIN_ADDRESS, 
-            contractAbi, 
-            contractRunner
-        ) as unknown as CertificateNft;
+   const contract = useMemo(() => {
+   const contractRunner = signer ?? provider;
+      if (!contractRunner) {
+         return null;
+      }
+      return new ethers.Contract(
+         CERTIFY_CHAIN_ADDRESS, 
+         contractAbi, 
+         contractRunner
+      ) as unknown as CertificateNft;
 
-    }, [signer]);
+   }, [signer]);
 
     return contract;
 }
@@ -62,9 +78,44 @@ export function useWalletConnect () {
     setToast({ ...closingToast, show: false });
    };
 
+   const checkAndSwitchNetwork = async () => {
+      if (typeof window === 'undefined' || !(window as any).ethereum) {
+         throw new Error("MetaMask is not installed");
+      }
+
+      const provider = new ethers.BrowserProvider((window as any).ethereum);
+      const network = await provider.getNetwork();
+      
+      if (network.chainId !== SEPOLIA_CHAIN_ID) {
+         try {
+            await (window as any).ethereum.request({
+               method: 'wallet_switchEthereumChain',
+               params: [{ chainId: SEPOLIA_NETWORK.chainId }],
+            });
+         } catch (switchError: any) {
+            if (switchError.code === 4902) {
+               await (window as any).ethereum.request({
+                  method: 'wallet_addEthereumChain',
+                  params: [SEPOLIA_NETWORK],
+               });
+            } else {
+               throw new Error("Failed to switch to Sepolia network");
+            }
+         }
+      }
+   };
+
    const connectWallet = useCallback( async()=>{
       try{
+         if (typeof window === 'undefined' || !(window as any).ethereum) {
+            showToast("Please install MetaMask to connect your wallet", 'error');
+            return;
+         }
+
          const provider = new ethers.BrowserProvider((window as any).ethereum);
+
+         showToast("Switching to Sepolia testnet...", 'info');
+         await checkAndSwitchNetwork();
 
          await provider.send("eth_requestAccounts", []);
          
@@ -73,9 +124,15 @@ export function useWalletConnect () {
 
          setSigner(currentSigner);
          setWalletAddress(currentWallet);
+         handleCloseToast();
 
-      } catch(error) {
+         (window as any).ethereum.on('chainChanged', () => {
+            window.location.reload();
+         });
+
+      } catch(error: any) {
          console.log("Couldn't connect to the wallet", error);
+         showToast(error.message || "Couldn't connect to the wallet", 'error');
       }
    },[]);
 
